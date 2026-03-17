@@ -5,31 +5,20 @@ import (
 	"os"
 
 	"github.com/1-AkM-0/sqliteTUI/internal/db"
+	"github.com/1-AkM-0/sqliteTUI/internal/tui"
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 func main() {
-	_, err := db.Open(os.Getenv("DB_PATH"))
+	client, err := db.Open(os.Getenv("DB_PATH"))
 	if err != nil {
 		log.Fatal(err)
 	}
-	/*
-			_, err = db.Tables()
-			if err != nil {
-				log.Fatal(err)
-			}
 
-				columns, err := db.Columns("applications")
-				if err != nil {
-					log.Fatal(err)
-				}
+	defer client.Close()
 
-				fmt.Println(columns)
-		rr, err := db.Execute("SELECT title FROM jobs")
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		fmt.Println(rr.Row)
-
-	*/
+	p := tea.NewProgram(tui.New(client))
+	if _, err := p.Run(); err != nil {
+		log.Fatal(err)
+	}
 }
